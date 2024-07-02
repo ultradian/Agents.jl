@@ -90,8 +90,10 @@ The evolution rules are functions given to the keywords `agent_step!`, `model_st
   in all calls to random functions. Accepts any subtype of `AbstractRNG`.
 - `agents_first::Bool = true`: whether to schedule and activate agents first and then
   call the `model_step!` function, or vice versa. Ignored if no `agent_step!` is given.
-- `warn=true`: some type tests for `AgentType(s)` are done, and by default
-  warnings are thrown when appropriate.
+- `validate=true`: some type tests for `AgentType(s)` are done by default, use
+  `validate=false` to suppress them.
+- `warn=true`: by default warnings are thrown when appropriate if validation for `AgentType(s)` 
+   takes place.
 
 ## Advanced stepping
 
@@ -138,6 +140,7 @@ function StandardABM(
     properties::P = nothing,
     rng::R = Random.default_rng(),
     agents_first::Bool = true,
+    validate = true,
     warn = true,
     warn_deprecation = true
 ) where {A<:AbstractAgent,S<:SpaceType,G,K,F,P,R<:AbstractRNG}
@@ -152,7 +155,7 @@ function StandardABM(
         ABMObservable.
         """ maxlog=1
     end
-    !(ismultiagenttype(A)) && agent_validator(A, space, warn)
+    !(ismultiagenttype(A)) && validate && agent_validator(A, space, warn)
     C = construct_agent_container(container, A)
     agents = C()
     agents_types = union_types(A)
